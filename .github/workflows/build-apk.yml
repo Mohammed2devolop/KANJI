@@ -35,7 +35,7 @@ jobs:
       - name: Build APK
         run: npx eas build --platform android --output=./build --non-interactive
         env:
-          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+          EXPO_TOKEN: Ji95goBfnQUtJqchNlXmz9u09Yi-qQilWMDJxf_I
 
       - name: Find APK file
         id: find_apk
