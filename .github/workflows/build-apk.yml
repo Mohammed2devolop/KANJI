@@ -8,7 +8,7 @@ on:
 jobs:
   build-apk:
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -25,7 +25,26 @@ jobs:
       - name: Install EAS CLI
         run: npm install -g eas-cli
 
+      # Optional: Initialize EAS project if not already set up
+      - name: Ensure eas.json exists and project is initialized
+        run: |
+          if [ ! -f eas.json ]; then
+            npx eas init --id $(uuidgen) --non-interactive
+          fi
+
       - name: Build APK
-        run: npx eas build --platform android --non-interactive
+        run: npx eas build --platform android --output=./build --non-interactive
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Find APK file
+        id: find_apk
+        run: |
+          APK_PATH=$(find ./build -type f -name '*.apk' | head -n 1)
+          echo "apk_path=$APK_PATH" >> $GITHUB_OUTPUT
+
+      - name: Upload APK as Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: apk-build
+          path: ${{ steps.find_apk.outputs.apk_path }}
